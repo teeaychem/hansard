@@ -1,0 +1,96 @@
+results for: prime
+	gov: 1914
+	opp: 3681
+	percentage gov: 0.3420911528150134
+	percentage opp: 0.6579088471849865
+	percentage all: 0.7224015493867011
+results for: have
+	gov: 990
+	opp: 1581
+	percentage gov: 0.38506417736289383
+	percentage opp: 0.6149358226371062
+	percentage all: 0.3319561007101356
+results for: not
+	gov: 892
+	opp: 1954
+	percentage gov: 0.3134223471539002
+	percentage opp: 0.6865776528460998
+	percentage all: 0.36746287927695287
+results for: minister
+	gov: 1960
+	opp: 3712
+	percentage gov: 0.3455571227080395
+	percentage opp: 0.6544428772919605
+	percentage all: 0.7323434473854099
+results for: id
+	gov: 1209
+	opp: 1949
+	percentage gov: 0.38283723875870806
+	percentage opp: 0.617162761241292
+	percentage all: 0.4077469335054874
+results for: end
+	gov: 1614
+	opp: 1076
+	percentage gov: 0.6
+	percentage opp: 0.4
+	percentage all: 0.3473208521626856
+results for: go
+	gov: 1405
+	opp: 2153
+	percentage gov: 0.39488476672287803
+	percentage opp: 0.605115233277122
+	percentage all: 0.4593931568754035
+results for: has
+	gov: 845
+	opp: 1494
+	percentage gov: 0.3612654980761009
+	percentage opp: 0.6387345019238991
+	percentage all: 0.3020012911555843
+results for: out
+	gov: 963
+	opp: 1634
+	percentage gov: 0.37081247593376976
+	percentage opp: 0.6291875240662302
+	percentage all: 0.3353131052291801
+results for: ere
+	gov: 1059
+	opp: 1650
+	percentage gov: 0.3909191583610188
+	percentage opp: 0.6090808416389811
+	percentage all: 0.3497740477727566
+results for: her
+	gov: 1459
+	opp: 2246
+	percentage gov: 0.39379217273954115
+	percentage opp: 0.6062078272604589
+	percentage all: 0.47837314396384767
+results for: no
+	gov: 1921
+	opp: 3024
+	percentage gov: 0.3884732052578362
+	percentage opp: 0.6115267947421638
+	percentage all: 0.6384764364105875
+results for: my
+	gov: 1798
+	opp: 1034
+	percentage gov: 0.6348870056497176
+	percentage opp: 0.3651129943502825
+	percentage all: 0.3656552614590058
+results for: his
+	gov: 1495
+	opp: 2568
+	percentage gov: 0.36795471326605955
+	percentage opp: 0.6320452867339404
+	percentage all: 0.5245965138799226
+results for: av
+	gov: 1371
+	opp: 2065
+	percentage gov: 0.3990104772991851
+	percentage opp: 0.6009895227008148
+	percentage all: 0.4436410587475791
+results for: mini
+	gov: 1983
+	opp: 3721
+	percentage gov: 0.3476507713884993
+	percentage opp: 0.6523492286115007
+	percentage all: 0.7364751452550032
