@@ -209,34 +209,55 @@ def removeColumns():
 
 def getQuestion():
 
-
+  counter = 0
 
   for file in os.listdir('../rawData/hansardBefore2010txtcleannew'):
 
     fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtcleannew/' + file)
-    inQuestion = False
+    questionTicker = 0
+
     with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
 
-      for line in f:
-        if re.search(r'.*<[Aa]\s+(?:name|NAME)\s*=\s*"', line):
-          inQuestion = True
+      questionDict = {'0': []}
 
-        if inQuestion == True:
-          print(line)
-        #   if inQuestion == False:
-        #     inQuestion = True
+
+      for line in f:
+        if re.search(r'.*<[Bb]', line):
+          name = re.search(r'.*<[Bb]>(.*)</[Bb]>', line)
+          if re.search(r'(?:Prime|Speaker)', name.group(1)) == None:
+        # if re.search(r'.*<[Aa]\s+(?:name|NAME)\s*=\s*"', line):
+          # if re.search(r'(?:meta|META)\s*(?:name|NAME)\s*=\s*"[Ss]peaker', line) == None:
+            questionTicker += 1
+            questionDict[str(questionTicker)] = []
+
+            print(name.group(1))
+            counter += 1
+          questionDict[str(questionTicker)].append(line)
+
+      # print(questionDict)
+        # we've got a ticker, so if it changes I know there's a new question. So, probs best to just make a counter
+
+
+
+        # if questionTicker == True:
+        #   print(line)
+        #   if questionTicker == False:
+        #     questionTicker = True
         #   else:
-        #     inQuestion = False
-        # if inQuestion == True:
+        #     questionTicker = False
+        # if questionTicker == True:
           # print(line)
 
 
         # input('x')
-    if inQuestion == False:
-      print(file)
-    print(file)
-    input('x')
-
+    # if questionTicker == False:
+    #   print(file)
+    # print(file)
+    # for key in questionDict.keys():
+    #   print(questionDict[key])
+    #   print('\n')
+    # input('x')
+  print(counter)
 # extractRelevantPartsOfBadHTMLFiles()
 # renamingTextFiles()
 # getMetaData()
