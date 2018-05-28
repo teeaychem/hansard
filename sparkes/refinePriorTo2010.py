@@ -142,10 +142,27 @@ def renamingTextFiles():
       saveFile = open(os.path.join(parentDir, 'rawData/hansardBefore2010txtdate/' + date + '-' + str(fileCount) + '.txt'), 'w')
 
       for line in f:
-        # print(line)
         saveFile.write("%s\n" % line)
 
 
+def getMetaData():
+
+  for file in os.listdir('../rawData/hansardBefore2010txtdate'):
+
+    fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtdate/' + file)
+
+    with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
+
+      metaVolume = False
+
+      for line in f:
+
+        if re.search(r'<meta.*content(?:\s*)=(?:\s*)"((?:\w|\s|\d|,|:)+)"', line):
+          metaVolumeRE = re.search(r'<meta.*content(?:\s*)=(?:\s*)"((?:\w|\s|\d|,|:)+)"', line)
+          metaVolume = metaVolumeRE.group(1)
+
+      if metaVolume != False:
+        print(metaVolume)
 
 
 
@@ -155,3 +172,4 @@ def renamingTextFiles():
 
 # extractRelevantPartsOfBadHTMLFiles()
 # renamingTextFiles()
+getMetaData()
