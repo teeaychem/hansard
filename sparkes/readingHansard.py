@@ -1,7 +1,5 @@
 import urllib  # requests and grabs information from web pages
 from bs4 import BeautifulSoup  # parses and searches HTML files
-import matplotlib.pyplot as plt  # plots results
-import matplotlib
 import re  # uses regular expressions to efficiently search large bodies of text
 import pickle  # allows export of dictionaries and facilitates pickle rick jokes
 from collections import Counter  # rapidly parses dictionaries
