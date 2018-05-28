@@ -152,24 +152,94 @@ def getMetaData():
     fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtdate/' + file)
 
     with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
-
       metaVolume = False
-
       for line in f:
-
-        if re.search(r'<meta.*content(?:\s*)=(?:\s*)"((?:\w|\s|\d|,|:)+)"', line):
-          metaVolumeRE = re.search(r'<meta.*content(?:\s*)=(?:\s*)"((?:\w|\s|\d|,|:)+)"', line)
+        if re.search(r'<meta.*content(?:\s*)=(?:\s*)"(H.*(?:\w|\s|\d|,|:)+)"', line):
+          metaVolumeRE = re.search(r'<meta.*content(?:\s*)=(?:\s*)"(H.*(?:\w|\s|\d|,|:)+)"', line)
           metaVolume = metaVolumeRE.group(1)
 
       if metaVolume != False:
         print(metaVolume)
+      else:
+        print(file)
+
+
+def cleanup():
+  # this takes ages, unsurprisingly
+
+  for file in os.listdir('../rawData/hansardBefore2010txtdate'):
+
+    fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtdate/' + file)
+    with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
+
+      saveFile = open(os.path.join(parentDir, 'rawData/hansardBefore2010txtclean/' + file + '-clean-' + '.txt'), 'w')
+      interestEnded = False
+      for line in f:
+        line = re.sub(r'.*\s*[\w\s\d]+:\sColumn.*\n?', '', line)
+        line = re.sub(r'.*\s*<(?:html|HTML).*\n?', '', line)
+        line = re.sub(r'.*\s*<(?:meta|META)\s*(?:name|NAME)\s*=\s*"(?:ObjectType|Publisher|Author|OtherAgent|Form|ISBN|Language|Identifier|Columns|Subject).*\n?', '', line)
+        line = re.sub(r'.*\s*<(?:link|LINK)\s*(?:rel|REL)\s*=.*\n?', '', line)
+        if re.search(r'>Next Section<', line):
+          interestEnded = True
+        if interestEnded == False and len(line.split()) > 0:
+          saveFile.write("%s\n" % line)
 
 
 
+def removeColumns():
+  # could be incorporated with cleanup
+
+   for file in os.listdir('../rawData/hansardBefore2010txtclean'):
+
+    fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtclean/' + file)
+    with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
+
+      saveFile = open(os.path.join(parentDir, 'rawData/hansardBefore2010txtcleannew/' + file), 'w')
+      for line in f:
+        line = re.sub(r'.*<a\s*name\s*=\s*"(?:[Cc]olumn|COLUMN).*\n?', '', line)
+        line = re.sub(r'<(?:/|)(?:[Pp]|BR|br|UL|ul)>\n?', '', line)
+        line = re.sub(r'&nbsp;\n?', '', line)
+        line = re.sub(r'<(?:head|HEAD)>\n?', '', line)
+        line = re.sub(r'<(?:hr|HR)>\n?', '', line)
+        line = re.sub(r'<(?:table|TABLE).*>\n?', '', line)
+        if len(line.split()) > 0:
+          saveFile.write("%s\n" % line)
 
 
 
+def getQuestion():
+
+
+
+  for file in os.listdir('../rawData/hansardBefore2010txtcleannew'):
+
+    fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtcleannew/' + file)
+    inQuestion = False
+    with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
+
+      for line in f:
+        if re.search(r'.*<[Aa]\s+(?:name|NAME)\s*=\s*"', line):
+          inQuestion = True
+
+        if inQuestion == True:
+          print(line)
+        #   if inQuestion == False:
+        #     inQuestion = True
+        #   else:
+        #     inQuestion = False
+        # if inQuestion == True:
+          # print(line)
+
+
+        # input('x')
+    if inQuestion == False:
+      print(file)
+    print(file)
+    input('x')
 
 # extractRelevantPartsOfBadHTMLFiles()
 # renamingTextFiles()
-getMetaData()
+# getMetaData()
+getQuestion()
+# cleanup()
+# removeColumns()
