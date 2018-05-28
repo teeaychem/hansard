@@ -5,6 +5,39 @@ import re
 from bs4 import BeautifulSoup  # parses and searches HTML files
 import fileinput
 
+
+def monStrToInt(month):
+  monthInt = 0
+  if month in 'January':
+    monthInt = '01'
+  elif month in 'February':
+    monthInt = '02'
+  elif month in 'March':
+    monthInt = '03'
+  elif month in 'April':
+    monthInt = '04'
+  elif month in 'May':
+    monthInt = '05'
+  elif month in 'June':
+    monthInt = '06'
+  elif month in 'July':
+    monthInt = '07'
+  elif month in 'August':
+    monthInt = '08'
+  elif month in 'September':
+    monthInt = '09'
+  elif month in 'October':
+    monthInt = '10'
+  elif month in 'November':
+    monthInt = '11'
+  elif month in 'December':
+    monthInt = '12'
+  return monthInt
+
+
+
+
+
 fileDir = os.path.dirname(os.path.abspath(__file__))
 parentDir = os.path.dirname(fileDir)
 
@@ -213,51 +246,169 @@ def getQuestion():
 
   for file in os.listdir('../rawData/hansardBefore2010txtcleannew'):
 
-    fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtcleannew/' + file)
-    questionTicker = 0
+    if re.search(r'^\.', str(file)):
+      pass
+    else:
 
-    with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
+      fileLoc = os.path.join(parentDir, 'rawData/hansardBefore2010txtcleannew/' + file)
+      questionTicker = 0
 
-      questionDict = {'0': []}
+      with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
 
+        fileRE = re.search(r'(\d+)\s(\w+) (\d{4})', str(file))
+        day = fileRE.group(1)
+        if len(day) == 1:
+          day = '0' + day
+        month = fileRE.group(2)
+        year = fileRE.group(3)
 
-      for line in f:
-        if re.search(r'.*<[Bb]', line):
-          name = re.search(r'.*<[Bb]>(.*)</[Bb]>', line)
-          if re.search(r'(?:Prime|Speaker)', name.group(1)) == None:
-        # if re.search(r'.*<[Aa]\s+(?:name|NAME)\s*=\s*"', line):
-          # if re.search(r'(?:meta|META)\s*(?:name|NAME)\s*=\s*"[Ss]peaker', line) == None:
+        date = year + monStrToInt(month) + day
+
+        questionDict = {
+          '0':
+            {
+              "name" : "META",
+              "date": date,
+              "raw" : [],
+              "comments" : [],
+              "question": '',
+              "a-tags" : [],
+            }
+          }
+
+        for line in f:
+
+          qLine = line
+
+          if re.search(r'.*<[Bb]', line):
+            name = "Unknown"
+            if re.search(r'.*<[Bb]>\s*(\w(?:\w|\s|\.)+).*?<\/[Bb]>', line):
+              name = re.search(r'.*<[Bb]>\s*(?:[Qq]|\d|\.|\s|\[|\])*(\w(?:\w|\s|\.)+).*?<\/[Bb]>', line)
+              name = name.group(1).strip()
+              name = re.sub(r'&#214;', 'Ö', name)
             questionTicker += 1
-            questionDict[str(questionTicker)] = []
+            questionDict[str(questionTicker)] = {}
+            questionDict[str(questionTicker)]["name"] = name
+            questionDict[str(questionTicker)]["date"] = date
+            questionDict[str(questionTicker)]["question"] = ''
+            questionDict[str(questionTicker)]["raw"] = []
+            questionDict[str(questionTicker)]["a-tags"] = []
+            questionDict[str(questionTicker)]["comments"] = []
 
-            print(name.group(1))
+            # print(name.group(1))
             counter += 1
-          questionDict[str(questionTicker)].append(line)
-
-      # print(questionDict)
-        # we've got a ticker, so if it changes I know there's a new question. So, probs best to just make a counter
 
 
+          # preserve comments…
+          if re.search(r'<!--.*?-->', line):
+            comments = re.findall(r'<!--(.*?)-->', line)
+            for comment in comments:
+              questionDict[str(questionTicker)]["comments"].append(comment)
 
-        # if questionTicker == True:
-        #   print(line)
-        #   if questionTicker == False:
-        #     questionTicker = True
-        #   else:
-        #     questionTicker = False
-        # if questionTicker == True:
-          # print(line)
+          # preserve a-tags
+          if re.search(r'<\s*[Aa].*?[Aa]>', line):
+            aTags = re.findall(r'<\s*[Aa](.*?)><\/[Aa]>', line)
+            for aTag in aTags:
+              questionDict[str(questionTicker)]["a-tags"].append(aTag)
 
 
-        # input('x')
-    # if questionTicker == False:
-    #   print(file)
-    # print(file)
-    # for key in questionDict.keys():
-    #   print(questionDict[key])
-    #   print('\n')
-    # input('x')
-  print(counter)
+
+
+          # removing things from the question
+          # … but remove them from the raw text
+          qLine = re.sub(r'(<!--.*?-->)', '', qLine)
+          # also remove \n
+          qLine = re.sub(r'\n', '', qLine)
+          # and a-tags
+          qLine = re.sub(r'<\s*[Aa](.*?)><\/[Aa]>', '', qLine)
+          # and b-tags
+          qLine = re.sub(r'</*[Bb]>', '', qLine)
+          # and i-tags
+          qLine = re.sub(r'</*[Ii]>', '', qLine)
+          # and font changes
+          qLine = re.sub(r'</*\s*(?:font|FONT).*?>', '', qLine)
+          # at this point, a few tags remain in questions, but these are only for the PM, and so can be ignored.
+
+          # Now, let's clean up the html
+          qLine = re.sub(r'&#(?:039|145|146);', '\'', qLine)
+          qLine = re.sub(r'&(?:quot|#147|#148);', '\"', qLine)
+          qLine = re.sub(r'&#150;', ' – ', qLine)
+          qLine = re.sub(r'&#151;', ' — ', qLine)
+          qLine = re.sub(r'&#163;', '£', qLine)
+          qLine = re.sub(r'&#8364;', '€', qLine)
+          qLine = re.sub(r'&#233;', 'é', qLine)
+          qLine = re.sub(r'&#237;', 'í', qLine)
+          qLine = re.sub(r'&#226;', 'â', qLine)
+          qLine = re.sub(r'&#244;', 'ô', qLine)
+          qLine = re.sub(r'&#246;', 'ö', qLine)
+          qLine = re.sub(r'&#214;', 'Ö', qLine)
+          qLine = re.sub(r'&#224;', 'à', qLine)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          if len(qLine) > 0:
+            questionDict[str(questionTicker)]["question"] += qLine
+
+
+
+          questionDict[str(questionTicker)]["raw"].append(line)
+
+
+
+
+
+
+          # input('x')
+      if questionTicker == False:
+        print(file)
+      print(file)
+      for item in questionDict.keys():
+        if questionDict[item]['name'] == "META":
+          pass
+        else:
+          print('~~~~~~~' + file)
+          print('name: ' + questionDict[item]['name'])
+          print('date: ' + questionDict[item]['date'])
+          print('question:')
+          print(questionDict[item]['question'])
+
+        # for key in questionDict[item].keys():
+        #   print(key + ':')
+        #   print('\n')
+        #   print(questionDict[item][key])
+        #   print('\n')
+
+      # # input('x')
+    print(counter)
+
+
+
+"""
+  Misc code
+"""
+
+#   name = re.search(r'.*<[Bb]>(.*)</[Bb]>', line)
+#   if re.search(r'(?:Prime|Speaker)', name.group(1)) == None:
+# if re.search(r'.*<[Aa]\s+(?:name|NAME)\s*=\s*"', line):
+#   if re.search(r'(?:meta|META)\s*(?:name|NAME)\s*=\s*"[Ss]peaker', line) == None:
+
+
+"""
+  Run specific functions
+"""
 # extractRelevantPartsOfBadHTMLFiles()
 # renamingTextFiles()
 # getMetaData()
