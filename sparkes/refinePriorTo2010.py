@@ -4,6 +4,7 @@ import os
 import re
 from bs4 import BeautifulSoup  # parses and searches HTML files
 import fileinput
+import pickle
 
 
 def monStrToInt(month):
@@ -244,6 +245,8 @@ def getQuestion():
 
   counter = 0
 
+  bigQList = []
+
   for file in os.listdir('../rawData/hansardBefore2010txtcleannew'):
 
     if re.search(r'^\.', str(file)):
@@ -344,21 +347,6 @@ def getQuestion():
           qLine = re.sub(r'&#214;', 'Ö', qLine)
           qLine = re.sub(r'&#224;', 'à', qLine)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           if len(qLine) > 0:
             questionDict[str(questionTicker)]["question"] += qLine
 
@@ -367,34 +355,268 @@ def getQuestion():
           questionDict[str(questionTicker)]["raw"].append(line)
 
 
+      bigQList.append(questionDict)
+
+      # input('x')
+    #   if questionTicker == False:
+    #     print(file)
+    #   print(file)
+    #   for item in questionDict.keys():
+    #     if questionDict[item]['name'] == "META":
+    #       pass
+    #     else:
+    #       print('~~~~~~~ ' + file + ' ~~~~~~~')
+    #       print('name: ' + questionDict[item]['name'])
+    #       print('date: ' + questionDict[item]['date'])
+    #       print('question:')
+    #       print(questionDict[item]['question'])
+
+    #     # for key in questionDict[item].keys():
+    #     #   print(key + ':')
+    #     #   print('\n')
+    #     #   print(questionDict[item][key])
+    #     #   print('\n')
+
+    #   # input('x')
+    # print(counter)
+  return bigQList
+
+# Run this to output a list of dictionaries, each dictionary corresponding to a file
+# bigQList = getQuestion()
+
+# We now save this so that we don't have to wait each time
+# pickle.dump( bigQList, open( "../data/basic1992000data.p", "wb" ) )
+# And so instead of running getQuestions() we load…
 
 
 
+def updateBasicData():
 
-          # input('x')
-      if questionTicker == False:
-        print(file)
-      print(file)
-      for item in questionDict.keys():
-        if questionDict[item]['name'] == "META":
+  counter = 0
+  lost = 0
+
+  ugh = set([])
+
+  globalDict = {
+    "Harriet Harman" : ["Camberwell and Peckham", "Lab"],
+    "Menzies Campbell" : ["North East Fife", "LD"], "Colin Challen" : ["Morley and Rothwell", "Lab"], "Chris Grayling": ["Epsom and Ewell", "Con"], "Harry Cohen": ["Leyton and Wanstead", "Lab"], "Colin Burgon": ["Elmet", "Lab"], "Linda Perham": ["Ilford North", "Lab"], "Gerald Kaufman": ["Manchester Ardwick/Gorton", "Lab"], "Jeremy Corbyn": ["Islington North", "Lab"], "Michael Spicer": ["West Worcestershire", "Con"], "Patrick Hall": ["Bedford", "Lab"], "Michael Howard": ["Folkestone and Hythe", "Con"], "David Cameron": ["Witney", "Con"], "William Hague" : ["Richmond", "Con"], "Geoff Hoon": ["Ashfield", "Lab"], "Nick Clegg": ["Sheffield Hallam", "LD"], "Bob Marshall-Andrews": ["Medway", "Lab"], "Charles Kennedy": ["Ross, Skye and Lochaber", "LD"], "Iain Duncan Smith": ["Chingford and Woodford Green", "Con"], "Michael Ancram": ["Devizes", "Con"], "Edward Heath":["Old Bexley and Sidcup", "Con"], "Henry Bellingham": ["North West Norfolk", "Con"], "Karl Turner": ["Kingston upon Hull East", "Lab"], "Brian Binley": ["Northampton South", "Con"], "Andrew Griffiths": ["Burton", "Con"], "Owen Paterson": ["North Shropshire", "Con"], "John Leech": ["Manchester, Withington", "LD"], "Alistair Carmichael": ["Orkney and Shetland", "LD"], "Peter Luff":["Mid Worcestershire", "Con"], "Graham Allen": ["Nottingham North", "Lab"], "Ben Chapman": ["Wirral South", "Lab"], "Andrew Murrison": ["South West Wiltshire", "Con"], "Richard Bacon": ["South Norfolk", "Con"], "Iain Luke": ["Dundee East", "Lab"], "Dennis Skinner": ["Bolsover", "Lab"], "Gordon Marsden": ["Blackpool South", "Lab"], "John Wilkinson": ["Ruislip-Northwood", "Con"], "Robin Cook": ["Livingston", "Lab"], "Eric Forth": ["Bromley and Chislehurst", "Con"], "George Young": ["North West Hampshire", "Con"], "Geoffrey Clifton-Brow": ["Cotswold", "Con"], "Angela Browning": ["Tiverton and Honiton", "Con"], "John Michael Jack": ["Fylde", "Con"], "Tim Loughton": ["East Worthing and Shoreham", "Con"], "Angela Watkinson": ["Upminster", "Con"], "Simon Burns": ["West Chelmsford", "Con"], "Gerald Howarth": ["Aldershot", "Con"], "Ann Winterton": ["Congleton", "Con"], "Richard Ottaway": ["Croydon, South", "Con"], "Michael Fabricant": ["Lichfield", "Con"], "Chris Bryant": ["Rhondda", "Lab"], "Fiona Mactaggart": ["Slough", "Lab"], "Jim Sheridan": ["Paisley and Renfrewshire, North", "Lab"], "John Robertson": ["Glasgow, North-West", "Lab"], "Kali Mountford": ["Colne Valley", "Lab"], "Peter Bradley": ["The Wrekin)", "Lab"], "Paddy Tipping": [ "Sherwood", "Lab"], "Ann Clwyd": ["Cynon Valley", "Lab"], "Cable": ["Twickenham", "LD"], "Clarke": ["Coatbridge, Chryston and Bellshill", "Lab"], "Salter": ["Reading, West", "Lab"], "Miller": ["Ellesmere Port and Neston", "Lab"], "Taylor": ["Rochford and Southend, East", "Con"], "Keeble": ["Northampton, North", "Lab"], "King": ["Kingswood", "Lab"], "Hughes": ["North Southwark and Bermondsey", "LD"], "Starkey": ["Milton Keynes, South-West", "Lab"], "Foster": ["Hastings and Rye", "Lab"], "Naysmith": ["Bristol, North-West", "Lab/Co-op"], "Harris": ["Glasgow, South", "Lab"], "Leigh": ["Gainsborough", "Con"], "Blunt": ["Reigate", "Con"], "Kidney": ["Stafford", "Lab"], "Prosser": ["Dover", "Lab"], "Hamilton": ["Leeds, North-East", "Lab"], "Gardiner": ["Brent, North", "Lab"], "Jenkins": ["Tamworth", "Lab"], "Garnier": ["Harborough", "Con"], "Beith": ["Berwick-upon-Tweed", "LD"], "Hayes": ["Hayes and Harlington", "Lab"], "McDonnell": ["Hayes and Harlington", "Lab"], "Purchase": ["Wolverhampton, North-East", "Lab/Co-op"], "Blizzard": ["Waveney", "Lab"], "Green": ["Ryedale", "Con"], "Greenway": ["Ryedale", "Con"], "Brady": ["Altrincham and Sale, West", "Con"], "Heathcoat": ["Wells", "Con"], "Havard": ["Merthyr Tydfil and Rhymney", "Lab"], "Salmond": ["Banff and Buchan", "SNP"], "Donohoe": ["Central Ayrshire", "Lab"], "Cash": ["Stone", "Con"], "Gibson": ["Norwich, North", "Lab"], "Illsley": ["Barnsley, Central", "Lab"], "Bercow": ["Buckingham", "Con"], "Robathan": ["Blaby", "Con"], "Cunningham": ["Coventry, South", "Lab"], "Tami": ["Alyn and Deeside", "Lab"], "Amess": ["Southend, West", "Con"], "Heppell": ["Nottingham, East", "Lab"], "Bottomley": ["Worthing, West", "Con"], "Winnick": ["Walsall, North", "Lab"], "Moffatt": ["Crawley", "Lab"], "Thomas": ["Crosby", "Lab"], "Brooke": ["Mid-Dorset and North Poole", "LD"], "Gilroy": ["Plymouth, Sutton", "Lab/Co-op"], "Prisk": ["Hertford and Stortford", "Con"], "McFall": ["West Dunbartonshire", "Lab/Co-op"], "Jackson": ["Peterborough", "Con"], "Brazier": ["Canterbury", "Con"], "Beresford": ["Mole Valley", "Con"], "Wyatt": ["Sittingbourne and Sheppey", "Lab"], "Barker": ["Bexhill and Battle", "Con"], "Crausby": ["Bolton, North-East", "Lab"], "Doughty": ["Cardiff South and Penarth", "Lab/Co-op"], "Goggins": ["Wythenshawe and Sale East", "Lab"], "Chope": ["Christchurch", "Con"], "Bradshaw": ["Exeter", "Lab"], "Burstow": ["Sutton and Cheam", "LD"], "Hendry": ["Inverness, Nairn, Badenoch and Strathspey", "SNP"], "Munn": ["Sheffield, Heeley", "Lab/Co-op"], "McCabe": ["Birmingham, Selly Oak", "Lab"], "Ward": ["Bradford East", "LD"], "Harvey": ["North Devon", "LD"], "Clappison": ["Hertsmere", "Con"], "Edwards": ["Carmarthen East and Dinefwr", "PC"], "Mullin": ["Kirkcaldy and Cowdenbeath", "SNP"], "Anderson": ["Blaydon", "Lab"], "Hammond": ["Wimbledon", "Con"], "Norris": ["Nottingham North", "Lab/Co-op"], "Sawford": ["Corby", "Lab/Co-op"], "Paice": ["South East Cambridgeshire", "Con"],
+    # For getting party with cons, prior to 2010
+    'Robinson': ['Strangford', 'DUP'], 'Cormack': ['South Staffordshire', 'Con'],'Swire': ['East Devon', 'Con'],'McGrady': ['South Down', 'SDLP'],'Mahmood': ['Birmingham, Perry Barr', 'Lab'],'Connarty': ['Linlithgow and East Falkirk', 'Lab'], 'McKenna': ['Cumbernauld, Kilsyth and Kirkintilloch, East', 'Lab'], 'Lazarowicz': ['Edinburgh, North and Leith', 'Lab/Co-op'], 'White': ['Southampton, Test', 'Lab'], 'Whitehead': ['Southampton, Test', 'Lab'], 'Begg': ['Aberdeen, South', 'Lab'], 'Buck': ['Buckingham', 'Con'], 'Blackman': ['City of Durham', 'Lab'], 'Llwyd': ['Meirionnydd Nant Conwy', 'PC'], 'Gillan': ['Chesham and Amersham', 'Con'], 'Gill': ['Chesham and Amersham', 'Con'], 'Spink': ['Castle Point', 'Ind'], 'Caton': ['Gower', 'Lab'], 'Davey': ['Bristol, West', 'Lab'], 'Lembit': ['Montgomeryshire', 'LD'], 'Selous': ['South-West Bedfordshire', 'Con'], 'Baron': ['Billericay', 'Con'], 'Dodds': ['Belfast, North', 'DUP'], 'Dismore': ['Hendon', 'Lab'], 'Simpson': ['Upper Bann', 'DUP'], 'Tapsell': ['Louth and Horncastle', 'Con'], 'Humble': ['Blackpool, North and Fleetwood', 'Lab'], 'Rosindell': ['Romford', 'Con'], 'Reed': ['Loughborough', 'Lab/Co-op'], 'Palmer': ['Broxtowe', 'Lab'], 'Mann': ['Bassetlaw', 'Lab'], 'Ellman': ['Liverpool, Riverside', 'Lab/Co-op'], 'Soames': ['Mid-Sussex', 'Con'], 'Jones': ['North Durham', 'Lab'], 'Vaz': ['Leicester, East', 'Lab'], 'Gapes': ['Ilford, South', 'Lab/Co-op'], 'Stoate': ['Dartford', 'Lab'], 'Mitchell': ['Sutton Coldfield', 'Con'], 'Davidson': ['Glasgow, South-West', 'Lab/Co-op'], 'Waterson': ['Eastbourne', 'Con'], 'Hood': ['Lanark and Hamilton, East', 'Lab'], 'Ennis': ['Barnsley, East and Mexborough', 'Lab'], 'McIntosh': ['Vale of York', 'Con'], 'Paisley': ['Paisley and Renfrewshire, North', 'Lab'], 'Reid': ['Argyll and Bute', 'LD'], 'Lidington': ['Aylesbury', 'Con'], 'Berry': ['Kingswood', 'Lab'], 'Hoyle': ['Chorley', 'Lab'], 'Francis': ['Horsham', 'Con'], 'Randall': ['Uxbridge', 'Con'], 'Madel': ['Bridgend', 'Lab'], 'Russell': ['Dumfries and Galloway', 'Lab'], 'Borrow': ['South Ribble', 'Lab'], 'Walley': ['Stoke-on-Trent, North', 'Lab'], 'McIsaac': ['Cleethorpes', 'Lab'], 'Clapham': ['Barnsley, West and Penistone', 'Lab'], 'Lewis': ['New Forest, East', 'Con'], 'Mole': ['Mole Valley', 'Con'], 'McCafferty': ['Calder Valley', 'Lab'], 'Wishart': ['Perth and North Perthshire', 'SNP'], 'Burden': ['Birmingham, Northfield', 'Lab'], 'Bruce': ['Gordon', 'LD'], 'Stuart': ['Beverley and Holderness', 'Con'], 'Mackay': ['Bracknell', 'Con'], 'Lucas': ['Wrexham', 'Lab'], 'House': ['Totnes', 'Con'], 'Ryan': ['Enfield, North', 'Lab'], 'Conway': ['Old Bexley and Sidcup', 'Con'], 'Pound': ['Ealing, North', 'Lab'], 'Barron': ['Rother Valley', 'Lab'], 'Steen': ['Totnes', 'Con'], 'Roy': ['Glenrothes', 'Lab'], 'Wright': ['Cannock Chase', 'Lab'], 'Wiggin': ['Leominster', 'Con'], 'Bayley': ['City of York', 'Lab'], 'Streeter': ['South-West Devon', 'Con'], 'Ruane': ['Vale of Clwyd', 'Lab'], 'Morgan': ['Cardiff, North', 'Lab'], 'McKechin': ['Glasgow, North', 'Lab'], 'Evans': ['Ribble Valley', 'Con'], 'Williams': ['Caernarfon', 'PC'], 'Hepburn': ['Jarrow', 'Lab'], 'Curtis': ['Crosby', 'Lab'], 'Kumar': ['Middlesbrough, South and East Cleveland', 'Lab'], 'Stunell': ['Hazel Grove', 'LD'], 'Maples': ['Stratford-on-Avon', 'Con'], 'Shipley': ['Shipley', 'Con'], 'Davies': ['Monmouth', 'Con'], 'Hoey': ['Vauxhall', 'Lab'], 'Stringer': ['Manchester, Blackley', 'Lab'], 'Gale': ['North Thanet', 'Con'], 'Cryer': ['Keighley', 'Lab'], 'Todd': ['South Derbyshire', 'Lab'], 'Levitt': ['High Peak', 'Lab'], 'Meacher': ['Oldham, West and Royton', 'Lab'], 'Atkins': ['Staffordshire, Moorlands', 'Lab'], 'Joyce': ['Falkirk', 'Lab'], 'Barrett': ['Edinburgh, West', 'LD'], 'Donaldson': ['Lagan Valley', 'DUP'], 'Sarwar': ['Glasgow, Central', 'Lab'], 'Osborne': ['Ayr, Carrick and Cumnock', 'Lab'], 'Weir': ['Angus', 'SNP'], 'Wood': ['Hornsey and Wood Green', 'LD'], 'Widdecombe': ['Maidstone and The Weald', 'Con'], 'Banks': ['Ochil and South Perthshire', 'Lab'], 'Webb': ['Northavon', 'LD'], 'Cawsey': ['Brigg and Goole', 'Lab'], 'Rowe': ['Rochdale', 'LD'], 'Grogan': ['Selby', 'Lab'], 'Martlew': ['Carlisle', 'Lab'], 'Bailey': ['West Bromwich, West', 'Lab/Co-op'], 'Twigg': ['Halton', 'Lab'], 'Stewart': ['Dundee, East', 'SNP'], 'Gidley': ['Romsey', 'LD'], 'Lloyd': ['Manchester, Central', 'Lab'], 'Norman': ['Lewes', 'LD'], 'Baker': ['Lewes', 'LD'], 'Dhanda': ['Gloucester', 'Lab'], 'Sanders': ['Torbay', 'LD'], 'Prentice': ['Pendle', 'Lab'], 'Follett': ['Stevenage', 'Lab'], 'Linton': ['Battersea', 'Lab'], 'Laing': ['Epping Forest', 'Con'], 'Mates': ['East Hampshire', 'Con'], 'MacShane': ['Rotherham', 'Lab'], 'Butterfill': ['Bournemouth, West', 'Con'], 'Flynn': ['Newport, West', 'Lab'], 'Price': ['Carmarthen, East and Dinefwr', 'PC'], 'Southworth': ['Warrington, South', 'Lab'], 'Chaytor': ['Bury, North', 'Lab'], 'Francois': ['Rayleigh', 'Con'], 'Heal': ['North-East Hertfordshire', 'Con'], 'Spring': ['West Suffolk', 'Con'], 'Farrelly': ['Newcastle-under-Lyme', 'Lab'], 'Grant': ['Grantham and Stamford', 'Lab'], 'Simmonds': ['Boston and Skegness', 'Con'], 'Younger': ['Teignbridge', 'LD'], 'Galloway': ['Dumfries and Galloway', 'Lab'], 'Baldry': ['Banbury', 'Con'], 'Hopkins': ['Luton, North', 'Lab'],
+    # For getting party with cons, from 2010 to 2018
+    'Ruffley': ['Bury St Edmunds', 'Con'], 'Leslie': ['Bristol North West', 'Con'], 'Adams': ['Selby and Ainsty', 'Con'], 'Ruddock': ['Lewisham, Deptford', 'Lab'], 'Plaskitt': ['Warwick and Leamington', 'Lab'], 'Redwood': ['Wokingham', 'Con'], 'Quin': ['Horsham', 'Con'], 'Johnson': ['Kingston upon Hull North', 'Lab'], 'Irranca': ['Ogmore', 'Lab'], 'Abbott': ['Hackney North and Stoke Newington', 'Lab'], 'Lammy': ['Tottenham', 'Lab'], 'Davis': ['Haltemprice and Howden', 'Con'], 'Cairns': ['Vale of Glamorgan', 'Con'], 'Dobbin': ['Heywood and Middleton', 'Lab/Co-op'], 'Stevenson': ['Carlisle', 'Con'], 'Flint': ['Don Valley', 'Lab'], 'Lansley': ['South Cambridgeshire', 'Con'], 'Brennan': ['Cardiff West', 'Lab'], 'Collins': ['Folkestone and Hythe', 'Con'], 'Efford': ['Eltham', 'Lab'], 'McDonagh': ['Mitcham and Morden', 'Lab'], 'Knight': ['Solihull', 'Con'], 'Mercer': ['Plymouth, Moor View', 'Con'], 'Allan': ['Telford', 'Con'], 'Sheerman': ['Huddersfield', 'Lab/Co-op'], 'Coaker': ['Gedling', 'Lab'], 'Eagle': ['Wallasey', 'Lab'], 'Hancock': ['West Suffolk', 'Con'], 'Brake': ['Carshalton and Wallington', 'LD'], 'Watson': ['West Bromwich East', 'Lab'], 'Mackinlay': ['South Thanet', 'Con'], 'Moran': ['Oxford West and Abingdon', 'LD'], 'Benn': ['Leeds Central', 'Lab'], 'Singh': ['Slough', 'Lab'], 'Swayne': ['New Forest West', 'Con'], 'Smyth': ['Bristol South', 'Lab'], 'Blears': ['Salford and Eccles', 'Lab'], 'Lamb': ['North Norfolk', 'LD'], 'Day': ['Linlithgow and East Falkirk', 'SNP'], 'Burnham': ['Leigh', 'Lab'], 'Lilley': ['Hitchin and Harpenden', 'Con'], 'Spelman': ['Meriden', 'Con'], 'Gummer': ['Ipswich', 'Con'], 'Browne': ['Taunton Deane', 'LD'], 'Arbuthnot': ['North East Hampshire', 'Con'], 'Mahon': ['Oldham West and Royton', 'Lab/Co-op'], 'Tyrie': ['Chichester', 'Con'], 'Gibb': ['Bognor Regis and Littlehampton', 'Con'], 'Grieve': ['Beaconsfield', 'Con'], 'Thompson': ['Midlothian', 'SNP'],
+      # from 2010ed
+      'Hoban': ['Fareham', 'Con'], 'Kirkbride': ['Bromsgrove', 'Con'], 'Syms': ['Poole', 'Con'], 'Hogg': ['Sleaford and North Hykeham', 'Con'], 'Breed': ['South-East Cornwall', 'LD'], 'McLoughlin': ['West Derbyshire', 'Con']
+
+  }
+
+  globalList = [key for key in globalDict.keys()]
+
+  bigQList = pickle.load(open( "../data/basic1992000data.p", "rb" ))
+
+  for i in range(len(bigQList)):
+
+    localDict = {}
+    localList = []
+
+
+
+    for qID in bigQList[i].keys():
+
+      questionDict = bigQList[i][qID]
+
+      genName = ''
+      genCons = ''
+      genPart = ''
+
+
+      if questionDict["name"] != "META":
+
+        # print(questionDict["name"])
+
+
+        question = questionDict["question"]
+        # print(question)
+
+        # print(questionDict["name"])
+        # question = questionDict["question"]
+        # print('original question: ')
+        # print(question)
+        # print('\n')
+
+        questionRE = re.search(r'^(.*?):\s*(.*)', question)
+        if questionRE:
+          questionPrefix = questionRE.group(1)
+          questionProper = questionRE.group(2)
+          if 'Prime Minister' in questionPrefix or 'Speaker' in questionPrefix or 'Member' in questionPrefix:
+            pass
+          elif len(questionPrefix) > 80:
+            #special case where something is odd, need to find an alternative
+            print('!!!special case')
+            print(questionPrefix)
+            pass
+          elif re.search(r'\(', questionPrefix) == None:
+            titleRE = re.search(r'^\s*(?:\w+\.)\s(.*)', questionPrefix)
+            if titleRE:
+              memIDer = titleRE.group(1)
+              for term in localList:
+                if memIDer in term:
+                  genName = term
+                  genCons = localDict[genName][0]
+                  genPart = localDict[genName][1]
+                  pass
+                else:
+                  lookup = questionPrefix.split()[-1]
+                  cond = 0
+                  for key in globalDict.keys():
+                    if lookup in key:
+                      lookup = key
+                      genName = lookup
+                      genCons = globalDict[lookup][0]
+                      genPart = globalDict[lookup][1]
+                      cond = 1
+                      break
+                  if cond == 0:
+                    print(questionPrefix)
+                  pass
+            else:
+              memIDer = questionPrefix.split()[-1]
+              for term in localList:
+                if memIDer in term:
+                  genName = term
+                  genCons = localDict[genName][0]
+                  genPart = localDict[genName][1]
+                  # print('genName: ' + genName + ' , genCons: ' + genCons + ' , genPart: ' + genPart)
+                else:
+                  lookup = questionPrefix.split()[-1]
+                  for key in globalDict.keys():
+                    if lookup in key:
+                      lookup = key
+                      genName = lookup
+                      genCons = globalDict[lookup][0]
+                      genPart = globalDict[lookup][1]
+              pass
+          else:
+            genRE = re.sub(r'^(?:(?:Q|\d|\.|\[|\s)*\]\s*)*', '', questionPrefix)
+            ConAndPartRE = re.search(r'^(?:\s*(\w(?:\w|\s|\.|-|\')+\w))\s*\((.*?)\)\s*\((.*?)\)', genRE)
+            if ConAndPartRE:
+              genName = ConAndPartRE.group(1)
+              genCons = ConAndPartRE.group(2)
+              genPart = ConAndPartRE.group(3)
+              localList.append(genName)
+              localDict[genName] = [genCons, genPart]
+            else:
+              onlyConRE = re.search(r'^(?:\s*(\w(?:\w|\s|\.|-|\')+\w))\s*\((.*?)\)', genRE)
+              if onlyConRE:
+                genName = onlyConRE.group(1)
+                genCons = onlyConRE.group(2)
+                genPart = 'Unknown'
+                if 'The Leader' in genName:
+                  genName = onlyConRE.group(2)
+                  genCons = 'Unknown'
+                # print('genName: ' + genName + ', genCons: ' + genCons)
+                # pass
+              else:
+                if 'Tom Harris' in questionPrefix:
+                  genName = 'Tom Harris'
+                  genCons = 'Glasgow, Cathcart'
+                  genPart = 'Lab'
+                pass
+
+          if genName != '':
+            questionDict["memName"] = genName
+            questionDict["memCons"] = genCons
+            questionDict["memPart"] = genPart
+          # print('genName: ' + genName + ' , genCons: ' + genCons + ' , genPart: ' + genPart)
+
+          if genPart == 'Unknown':
+            if 'Prime Minister' in questionPrefix or 'Speaker' in questionPrefix or 'Member' in questionPrefix:
+              pass
+            else:
+              lookup = questionDict['name'].split()[-1]
+              for key in localDict.keys():
+                if lookup in key:
+                  lookup = key
+                  genName = lookup
+                  genCons = localDict[lookup][0]
+                  genPart = localDict[lookup][1]
+              for key in globalDict.keys():
+                if lookup in key:
+                  lookup = key
+                  genName = lookup
+                  genCons = globalDict[lookup][0]
+                  genPart = globalDict[lookup][1]
+
+
+            if genName == '' or genPart == 'Unknown':
+              if 'Prime Minister' in questionPrefix or 'Speaker' in questionPrefix or 'Member' in questionPrefix:
+                pass
+              else:
+                ugh = ugh.union([questionDict['name']])
+                lost +=1
+                # print()
+                # print(localDict)
+                # print(questionDict["date"])
+                # print(questionDict['raw'])
+
+          if genName != '' and genPart != 'Unknown':
+            counter += 1
+        else:  # this triggers if we haven't found a separator. Only a couple of questions appear missed.
+          # print(question)
           pass
-        else:
-          print('~~~~~~~' + file)
-          print('name: ' + questionDict[item]['name'])
-          print('date: ' + questionDict[item]['date'])
-          print('question:')
-          print(questionDict[item]['question'])
 
-        # for key in questionDict[item].keys():
-        #   print(key + ':')
-        #   print('\n')
-        #   print(questionDict[item][key])
-        #   print('\n')
+        # print(questionDict)
+  print('total good:' + str(counter))
+  print(list(ugh))
+  print('length of ugh list: ' + str(len(list(ugh))))
+  print('lost: ' + str(lost))
+          # print(questionPrefix)
 
-      # # input('x')
-    print(counter)
+          # print(questionPrefix)
+          # print(questionProper)
+        # else:
+        #   # print('\n~~~~ New Question ~~~~\n')
+        #   # print(questionDict["name"])
+        #   # print('original question: ')
+        #   # print(question)
+        #   # print('\n')
+        #   pass
+    # input('x')
+
+  return ugh
 
 
+def searchNames():
+
+  # finally, a clever trick.
+  # We pipe every name which isn't found from the main function into this function, which then
+  # checks to see whether the data was somewhere else in the HTML files
+
+  names = updateBasicData()
+
+  outList = {}
+
+  for file in os.listdir('../hansardBefore2010ed'):
+    # file = 'vol416-cm200304-vo040107-40107-03_sbhd2.html'
+    fileLoc = os.path.join(parentDir, 'hansardBefore2010ed/' + file)
+    with codecs.open(fileLoc, "rb", encoding="utf-8", errors='ignore') as f:
+
+      for line in f:
+
+        for name in names:
+          if re.search(name.split()[-1], line):
+            # print(line)
+            ConAndPartRE = re.search(r'\((.*?)\)\s*\((.*?)\)', line)
+            if ConAndPartRE:
+              genCons = ConAndPartRE.group(1)
+              genPart = ConAndPartRE.group(2)
+              genName = name.split()[-1]
+              outList[genName] = [genCons, genPart]
+  print(outList)
+
+
+updateBasicData()
+
+searchNames()
 
 """
   Misc code
@@ -412,6 +634,6 @@ def getQuestion():
 # extractRelevantPartsOfBadHTMLFiles()
 # renamingTextFiles()
 # getMetaData()
-getQuestion()
+# getQuestion()
 # cleanup()
 # removeColumns()
