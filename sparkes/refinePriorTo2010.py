@@ -4,6 +4,7 @@ import os
 import re
 from bs4 import BeautifulSoup  # parses and searches HTML files
 import fileinput
+import csv
 import pickle
 
 
@@ -396,6 +397,7 @@ def updateBasicData():
   lost = 0
 
   ugh = set([])
+  finalQs = []
 
   globalDict = {
     "Harriet Harman" : ["Camberwell and Peckham", "Lab"],
@@ -560,6 +562,7 @@ def updateBasicData():
 
           if genName != '' and genPart != 'Unknown':
             counter += 1
+            finalQs.append(questionDict)
         else:  # this triggers if we haven't found a separator. Only a couple of questions appear missed.
           # print(question)
           pass
@@ -582,7 +585,7 @@ def updateBasicData():
         #   pass
     # input('x')
 
-  return ugh
+  return finalQs
 
 
 def searchNames():
@@ -614,9 +617,88 @@ def searchNames():
   print(outList)
 
 
-updateBasicData()
+theseQs = updateBasicData()
 
-searchNames()
+funCount = 0
+
+major1 = ['Con']
+majorcas = ['UUP']
+blair = ['Lab', 'Lab/Co-op', 'Lab/ Co-op']
+brown1 = ['Lab', 'Lab/Co-op', 'Lab/ Co-op']
+camclegg = ['Con', 'LD']
+cam2 = ['Con']
+may1 = ['Con']
+may2 = ['Con']
+may2cas = ['DUP']
+
+def findAffi(party, date):
+  gov = []
+  cas = []
+  # Determine the government
+  if date <= 19961207:
+    gov = major1
+  elif date <= 19970502:
+    gov = major1
+    cas = majorcas
+  elif date <= 20070627:
+    gov = blair
+  if date <= 20100511:
+    gov = brown1
+  elif date <= 20150508:
+    gov = camclegg
+  elif date <= 20160713:
+    gov = cam2
+  elif date <= 20170611:
+    gov = may1
+  else:
+    gov = may2
+    cas = may2cas
+  # Is this part in government?
+  if party in gov:
+    return 'gov'
+  elif party in cas:
+    return 'cas'
+  else:
+    return 'opp'
+
+allParties = set([])
+
+govCount = 0
+oppCount = 0
+
+finalQs = []
+print("go!")
+print()
+print("hoi")
+
+for q in theseQs:
+  # print(q)
+  if q["question"] and q["memPart"] and q["date"]:
+    if ':' in q["question"]:
+      que = q["question"][q["question"].find(":")+1:].strip()
+    else:
+      que = q["question"].strip()
+    affi = findAffi(q["memPart"], int(q["date"]))
+    finalQs.append({"Question":que, "memName":q["memName"],  "memCons":q["memCons"], "memPart":q["memPart"], "date":q["date"], "memAffi":affi})
+    allParties.add(q["memPart"])
+    funCount += 1
+
+
+def d_dict_to_csv(dic):
+  keys = dic[0].keys()
+  print(keys)
+  with open('../data/qbankextra.csv', 'w', newline='',encoding='utf-8') as output_file:
+    dict_writer = csv.DictWriter(output_file, keys)
+    dict_writer.writeheader()
+    dict_writer.writerows(dic)
+  return
+
+d_dict_to_csv(finalQs)
+
+print(len(finalQs))
+print(allParties)
+
+# searchNames()
 
 """
   Misc code

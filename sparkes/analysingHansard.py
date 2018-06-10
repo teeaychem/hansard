@@ -4,7 +4,7 @@
 import csv
 
 questions = []
-with open('../data/qbankAnon.csv', encoding='utf-8') as f:
+with open('../data/combinedQBankAnon.csv', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for q in reader:
         questions.append([q['Question'], q['memAffi']])
@@ -19,7 +19,7 @@ def testWord(word):
   opp = 0
   # resetCounters()
   for question in questions:
-    if word in question[0]:
+    if word in question[0].split():
       if question[1] == 'gov':
         gov = gov + 1
       else:
