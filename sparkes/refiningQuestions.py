@@ -15,6 +15,7 @@ with open('../data/combinedQBank.csv', encoding='utf-8') as f:
     # print(q)
 
 keys = reader[0].keys()
+
 with open('../data/combinedQBankAnon2.csv', 'w', newline='',encoding='utf-8') as output_file:
     dict_writer = csv.DictWriter(output_file, keys)
     dict_writer.writeheader()
